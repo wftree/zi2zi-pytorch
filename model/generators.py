@@ -4,7 +4,7 @@ from torch.nn import init
 import functools
 from torch.optim import lr_scheduler
 
-
+# input_nc=3, output_nc=3 => input_nc=1, output_nc=1
 class UNetGenerator(nn.Module):
     """Create a Unet-based generator"""
 

@@ -43,7 +43,10 @@ class DatasetFromObj(data.Dataset):
             process byte stream to training data entry
         """
         image_file = bytes_to_file(img_bytes)
-        img = Image.open(image_file)
+        #print(image_file)
+        img = Image.open(image_file) #.convert('RGB')
+        #print(img)
+        #input('wait')
         try:
             img_A, img_B = read_split_image(img)
             if self.augment:
@@ -61,9 +64,9 @@ class DatasetFromObj(data.Dataset):
                 nw = int(multiplier * w) + 1
                 nh = int(multiplier * h) + 1
 
-                # Used to use Image.BICUBIC, change to ANTIALIAS, get better image.
-                img_A = img_A.resize((nw, nh), Image.ANTIALIAS)
-                img_B = img_B.resize((nw, nh), Image.ANTIALIAS)
+                # Used to use Image.BICUBIC, change to LANCZOS , get better image.
+                img_A = img_A.resize((nw, nh), Image.LANCZOS ) #.convert('RGB')
+                img_B = img_B.resize((nw, nh), Image.LANCZOS ) #.convert('RGB')
 
                 shift_x = random.randint(0, max(nw - w - 1, 0))
                 shift_y = random.randint(0, max(nh - h - 1, 0))
@@ -107,6 +110,9 @@ class DatasetFromObj(data.Dataset):
                 img_A = self.transform(img_A)
                 img_B = self.transform(img_B)
 
+            #print(img_A)
+            #print(img_B)
+            #input('wait')
             return img_A, img_B
 
         finally:

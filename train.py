@@ -42,7 +42,7 @@ parser.add_argument('--flip_labels', action='store_true',
 parser.add_argument('--random_seed', type=int, default=777,
                     help='random seed for random and pytorch')
 parser.add_argument('--resume', type=int, default=None, help='resume from previous training')
-parser.add_argument('--input_nc', type=int, default=3,
+parser.add_argument('--input_nc', type=int, default=1,
                     help='number of input images channels')
 
 def chkormakedir(path):

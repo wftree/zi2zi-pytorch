@@ -139,11 +139,15 @@ class Zi2ZiModel:
 
     def update_lr(self):
         # There should be only one param_group.
+        # Hawk https://zhuanlan.zhihu.com/p/410971793 参考文中算式，进行划分，调整lr
+        # 0.1*batch_size/256
+        _min_lr = 0.0001 #0.0375
         for p in self.optimizer_D.param_groups:
             current_lr = p['lr']
             update_lr = current_lr / 2.0
             # minimum learning rate guarantee
-            update_lr = max(update_lr, 0.0002)
+            # update_lr = max(update_lr, 0.0002)
+            update_lr = max(update_lr, _min_lr)
             p['lr'] = update_lr
             print("Decay net_D learning rate from %.5f to %.5f." % (current_lr, update_lr))
 
@@ -151,7 +155,8 @@ class Zi2ZiModel:
             current_lr = p['lr']
             update_lr = current_lr / 2.0
             # minimum learning rate guarantee
-            update_lr = max(update_lr, 0.0002)
+            # update_lr = max(update_lr, 0.0002)
+            update_lr = max(update_lr, _min_lr)
             p['lr'] = update_lr
             print("Decay net_G learning rate from %.5f to %.5f." % (current_lr, update_lr))
 
@@ -230,14 +235,27 @@ class Zi2ZiModel:
         Parameters:
             epoch (int) -- current epoch; used in the file name '%s_net_%s.pth' % (epoch, name)
         """
+        print('Load start')
         for name in ['G', 'D']:
+            print(name)
             if isinstance(name, str):
                 load_filename = '%s_net_%s.pth' % (epoch, name)
                 load_path = os.path.join(self.save_dir, load_filename)
+                print(load_path)
                 net = getattr(self, 'net' + name)
+                print('loading')
 
                 if self.gpu_ids and torch.cuda.is_available():
-                    net.load_state_dict(torch.load(load_path))
+                    model = torch.load(load_path)
+                    """
+                    if(name == 'D'):
+                        model.pop('model.0.weight')
+                    if(name == 'G'):
+                        model.pop('model.down.0.weight')
+                        model.pop('model.up.1.weight')
+                        model.pop('model.up.1.bias')
+                    """
+                    net.load_state_dict(model, strict = False)
                 else:
                     net.load_state_dict(torch.load(load_path,map_location=torch.device('cpu')))
                 # net.eval()
